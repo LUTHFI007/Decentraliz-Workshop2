@@ -42,8 +42,8 @@ jobs:
           cat response.json
 
           IPFS_HASH=$(jq -r '.IpfsHash' response.json)
-          echo "IPFS_HASH=$IPFS_HASH" >> $GITHUB_ENV
+          echo "IPFS_HASH=$IPFS_HASH" >> $GITHUB_ENV  # Save to GitHub Actions environment
 
-      # Step 5: Print IPFS URL
+      # Step 5: Print the IPFS URL
       - name: Print IPFS URL
-        run: echo "Website deployed to IPFS: "https://gateway.pinata.cloud/ipfs/$IPFS_HASH"
+        run: echo "Website deployed to IPFS: https://gateway.pinata.cloud/ipfs/${{ env.IPFS_HASH }}"
