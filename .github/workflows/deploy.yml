@@ -46,4 +46,4 @@ jobs:
 
       # Step 5: Print IPFS URL
       - name: Print IPFS URL
-        run: echo "Website deployed to IPFS: https://gateway.pinata.cloud/ipfs/$IPFS_HASH"
+        run: echo "Website deployed to IPFS: "https://gateway.pinata.cloud/ipfs/$IPFS_HASH"
