@@ -10,32 +10,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-    - name: Install Dependencies
-      run: |
-        sudo apt update
-        sudo apt install zip -y
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install zip -y jq -y
 
-    - name: Zip Static Files
-      run: zip -r website.zip . -x "*.git*"  # Exclude .git files
+      - name: Zip Static Files
+        run: |
+          zip -r website.zip . -x "*.git*"  # Exclude .git files
+          ls -lah website.zip  # Verify the zip file is created
 
-    - name: Upload to IPFS via Pinata
-      env:
-        PINATA_API_KEY: ${{ secrets.PINATA_API_KEY }}
-        PINATA_SECRET_API_KEY: ${{ secrets.PINATA_SECRET_API_KEY }}
-      run: |
-        curl -X POST "https://api.pinata.cloud/pinning/pinFileToIPFS" \
-        -H "pinata_api_key: $PINATA_API_KEY" \
-        -H "pinata_secret_api_key: $PINATA_SECRET_API_KEY" \
-        -F "file=@website.zip" > response.json
+      - name: Upload to IPFS via Pinata
+        env:
+          PINATA_API_KEY: ${{ secrets.PINATA_API_KEY }}
+          PINATA_SECRET_API_KEY: ${{ secrets.PINATA_SECRET_API_KEY }}
+        run: |
+          curl -X POST "https://api.pinata.cloud/pinning/pinFileToIPFS" \
+          -H "pinata_api_key: $PINATA_API_KEY" \
+          -H "pinata_secret_api_key: $PINATA_SECRET_API_KEY" \
+          -H "Content-Type: multipart/form-data" \
+          -F "file=@website.zip" -v > response.json
 
-        echo "IPFS Response:"
-        cat response.json
+          echo "IPFS Response:"
+          cat response.json
 
-        IPFS_HASH=$(jq -r '.IpfsHash' response.json)
-        echo "IPFS_HASH=$IPFS_HASH" >> $GITHUB_ENV
+          IPFS_HASH=$(jq -r '.IpfsHash' response.json)
+          echo "IPFS_HASH=$IPFS_HASH" >> $GITHUB_ENV
 
-    - name: Print IPFS URL
-      run: echo "Website deployed to IPFS: https://gateway.pinata.cloud/ipfs/$IPFS_HASH"
+      - name: Print IPFS URL
+        run: echo "Website deployed to IPFS: https://gateway.pinata.cloud/ipfs/$IPFS_HASH"
